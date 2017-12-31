@@ -1,0 +1,7 @@
+# dataset
+data/
+
+# log
+tb_log/
+log.txt
+
