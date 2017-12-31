@@ -1,0 +1,4 @@
+mpg123 -w output.wav input.mp3                -----mp3 to wav
+sox infile.wav outfile.wav channels 1         -----stereo to mono
+sox infile.wav outfile.wav trim 5             -----remove the first 5 seconds of the infile
+sox infile.wav outfile.wav trim 0 5           -----get a clip from 00:00 to 00:05 of the infile
