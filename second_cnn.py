@@ -108,8 +108,10 @@ if __name__ == '__main__':
     log = open('log.txt', 'a')
     sys.stdout = log
     # tf.app.run(main=main)
+    print('-------------------------start-------------------------')
     print(time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())))
     main()
     print(time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())))
+    print('--------------------------end--------------------------')
     log.close()
     
