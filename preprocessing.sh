@@ -33,14 +33,42 @@
 
 # rm -r ../temp/
 
+if ! test -e data; then
+    echo "Cannot find folder data!"
+    exit 1
+fi
 
+cd data
 
+if ! test -e source_songs; then
+    echo "Cannot find folder source_songs!"
+    exit 1
+fi
+
+if test -e processed_songs; then
+    rm -r processed_songs
+fi
+
+if test -e clips; then
+    rm -r clips
+fi
+
+if test -e spectrogram; then
+    rm -r spectrogram
+fi
+
+if test -e npz; then
+    rm -r npz
+fi
 
 if test -e temp ; then
     rm -r temp
 fi
 
-cd data/source_songs
+mkdir processed_songs clips spectrogram npz
+
+
+cd source_songs
 for class in $(ls); do
     mkdir temp
     cd $class

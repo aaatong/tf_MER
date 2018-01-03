@@ -52,7 +52,7 @@ for j in range(audio_num):
     plt.axis('off')
     fig = plt.gcf()
     # plt.show()
-    fig.set_size_inches(1, 1)  # set the img size to 1 inch by 1 inch
+    fig.set_size_inches(2, 1)  # set the img size to 1 inch by 1 inch
     # img_name = class_name[i]+'_'+str(j)+'.jpg'
     img_name = audio_names[j].replace('.wav', '.jpg')
     fig.savefig('./data/spectrogram/'+img_name, dpi=128, frameon=False)
