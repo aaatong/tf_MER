@@ -138,7 +138,7 @@ def main():
                 train_writer.add_summary(summary, i)
                 print('step %d, training accuracy %g, loss %g' % (i, train_accuracy, loss))
                 sys.stdout.flush()
-            sess.run(train_step, feed_dict={x_input: batch_x, y_input: batch_y, keep_prob: 1.0})
+            sess.run(train_step, feed_dict={x_input: batch_x, y_input: batch_y, keep_prob: 0.5})
 
         test_accuracy = sess.run(accuracy, feed_dict={x_input: nd.test_x, y_input: nd.test_y, keep_prob: 1.0})
         print('test accuracy %g' % test_accuracy)
