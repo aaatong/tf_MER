@@ -85,14 +85,16 @@ def main():
         train_writer = tf.summary.FileWriter('tb_log/train', sess.graph)
         # test_writer = tf.summary.FileWriter('tb_log/test')
         sess.run(tf.global_variables_initializer())
-        sess.run(nd.iterator.initializer)
+        sess.run(tf.local_variables_initializer())
+        # sess.run(nd.iterator.initializer)
+        sess.run(nd.training_init_op)
         sess.graph.finalize()
         # batch_x, batch_y = nd.next_batch
         # batch_x = batch_x.eval()
         # batch_y = batch_y.eval()
         for i in range(1, num_steps+1):
             batch_x, batch_y = nd.next_batch
-            batch_x = batch_x.eval()
+            batch_x = batch_x.eval()    # convert a tensor to a numpy array
             batch_y = batch_y.eval()
             if i % 100 == 0 or i == 1:
                 summary, train_accuracy, loss = sess.run([merged, accuracy, cross_entropy], feed_dict={x_input: batch_x, y_input: batch_y, keep_prob: 0.5})
@@ -101,8 +103,20 @@ def main():
                 sys.stdout.flush()
             sess.run(train_step, feed_dict={x_input: batch_x, y_input: batch_y, keep_prob: 0.5})
 
-        test_accuracy = sess.run(accuracy, feed_dict={x_input: nd.test_x, y_input: nd.test_y, keep_prob: 1.0})
-        print('test accuracy %g' % test_accuracy)
+        sess.run(nd.test_init_op)
+        test_accuracy, acc_update_op = tf.metrics.accuracy(labels=tf.arg_max(y_input, 1), predictions=tf.arg_max(cnn_output, 1))
+        metrics = {
+            'accuracy': test_accuracy,
+            'acc_op': acc_update_op
+        }
+        for i in range(nd.test_batch_num):
+            test_x, test_y = nd.next_batch
+            test_x = test_x.eval()
+            test_y = test_y.eval()
+            rst = sess.run((test_accuracy, acc_update_op), feed_dict={x_input: test_x, y_input: test_y, keep_prob: 1.0})
+        print('test accuracy %g' % rst[1])
+        # test_accuracy = sess.run(accuracy, feed_dict={x_input: nd.test_x, y_input: nd.test_y, keep_prob: 1.0})
+        # print('test accuracy %g' % test_accuracy)
         # print('test accuracy %g' % accuracy.eval(feed_dict={x_input: nd.test_x, y_input: nd.test_y, keep_prob: 1.0}))
 
 if __name__ == '__main__':
