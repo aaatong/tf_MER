@@ -92,7 +92,7 @@ def cnn(x, keep_prob, phase_train):
     return cnn_output, keep_prob
 
 def main():
-    num_steps = 20000
+    num_steps = 15000
     x_input = tf.placeholder(tf.float32, [None, 128, 256])
     y_input = tf.placeholder(tf.int32, [None, nd.num_classes])
 
@@ -121,6 +121,35 @@ def main():
     merged = tf.summary.merge_all()
 
     with tf.Session() as sess:
+        def run_test():
+            sess.run(nd.test_init_op)
+            test_accuracy, acc_update_op = tf.metrics.accuracy(
+                labels=tf.argmax(y_input, 1), 
+                predictions=tf.argmax(cnn_output, 1))
+            # metrics = {
+            #     'accuracy': test_accuracy,
+            #     'acc_op': acc_update_op
+            # }
+            batch_x, batch_y = nd.next_batch
+            for i in range(nd.test_batch_num):
+                # print('tick')
+                sess.run(tf.local_variables_initializer())
+                
+                # test_x, test_y = (batch_x, batch_y).eval()
+                test_x, test_y = sess.run((batch_x, batch_y))
+                # test_y = batch_y.eval()
+                
+                # print(sess.run(tf.shape(cnn_output),feed_dict={x_input: test_x, y_input: test_y, keep_prob: 1.0, phase_train: False}))
+                # print(sess.run(tf.shape(test_y)))
+                rst = sess.run((test_accuracy, acc_update_op), feed_dict={
+                    x_input: test_x, y_input: test_y, keep_prob: 1.0, 
+                    phase_train: False})
+            print('----------------------------------test accuracy %g' % rst[1])
+
+            sess.run(nd.training_init_op)
+            
+
+
         train_writer = tf.summary.FileWriter('tb_log/train', sess.graph)
         # test_writer = tf.summary.FileWriter('tb_log/test')
         sess.run(tf.global_variables_initializer())
@@ -151,34 +180,10 @@ def main():
             sess.run(train_step, feed_dict={x_input: train_x, y_input: train_y, 
                                             keep_prob: 0.5, 
                                             phase_train: True})
+            if i % 1000 == 0:
+                run_test()
 
-        sess.run(nd.test_init_op)
-        test_accuracy, acc_update_op = tf.metrics.accuracy(
-            labels=tf.argmax(y_input, 1), 
-            predictions=tf.argmax(cnn_output, 1))
-        # metrics = {
-        #     'accuracy': test_accuracy,
-        #     'acc_op': acc_update_op
-        # }
-        batch_x, batch_y = nd.next_batch
-        for i in range(nd.test_batch_num):
-            # print('tick')
-            sess.run(tf.local_variables_initializer())
-            
-            # test_x, test_y = (batch_x, batch_y).eval()
-            test_x, test_y = sess.run((batch_x, batch_y))
-            # test_y = batch_y.eval()
-            
-            # print(sess.run(tf.shape(cnn_output),feed_dict={x_input: test_x, y_input: test_y, keep_prob: 1.0, phase_train: False}))
-            # print(sess.run(tf.shape(test_y)))
-            rst = sess.run((test_accuracy, acc_update_op), feed_dict={
-                x_input: test_x, y_input: test_y, keep_prob: 1.0, 
-                phase_train: False})
-        print('test accuracy %g' % rst[1])
 
-        # test_accuracy = sess.run(accuracy, feed_dict={x_input: nd.test_x, y_input: nd.test_y, keep_prob: 1.0})
-        # print('test accuracy %g' % test_accuracy)
-        # print('test accuracy %g' % accuracy.eval(feed_dict={x_input: nd.test_x, y_input: nd.test_y, keep_prob: 1.0}))
 
 if __name__ == '__main__':
     log = open('log.txt', 'a')
