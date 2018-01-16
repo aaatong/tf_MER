@@ -109,25 +109,53 @@ import tensorflow as tf
 #   print("v1 : %s" % v1.eval())
 #   print("v2 : %s" % v2.eval())
 
+# import npz2dataset as nd
+# from tensorflow.python.tools import inspect_checkpoint as chkp
+# chkp.print_tensors_in_checkpoint_file('../tmp/my-model', tensor_name='fc1/b_fc1', all_tensors=False)
 
-# # tf.reset_default_graph()
 
-# # Create some variables.
-# # b_conv1 = tf.Variable(tf.constant(0.0, shape=[16]), name='b_conv1')
-# cross_entropy = tf.get_variable('cross_entropy', shape=[])
+# tf.reset_default_graph()
+# imported_meta = tf.train.import_meta_graph("../tmp/my-model.meta")  
 
-# # Add ops to save and restore all the variables.
-# saver = tf.train.Saver()
-
-# # Later, launch the model, use the saver to restore variables from disk, and
-# # do some work with the model.
+# batch_x, batch_y = nd.next_batch
 # with tf.Session() as sess:
-#   # Restore variables from disk.
-#   saver.restore(sess, "../tmp/my-model")
-#   print("Model restored.")
-#   # Check the values of the variables
-#   print(sess.run(b_conv1))
+#     # Restore variables from disk
+#     #   sess.run(tf.global_variables_initializer())
+#     imported_meta.restore(sess, "../tmp/my-model")
+#     #   saver.restore(sess, "../tmp/my-model")
+#     #   imported_meta.restore(sess, tf.train.latest_checkpoint('../tmp/'))
+#     print("Model restored.")
+#     # Check the values of the variables
+#     train_x, train_y = sess.run((batch_x, batch_y))
+#     x_input = tf.get_default_graph().get_tensor_by_name('x_input:0')
+#     y_input = tf.get_default_graph().get_tensor_by_name('y_input:0')  
+#     train_step = tf.get_default_graph().get_operation_by_name('optimizer/train_step')
+#     #   print(sess.run(x_input))
+#     sess.run(train_step, feed_dict={x_input: train_x, y_input: train_y})
 
-i = 2
-if i in [0,1,2,3,4]:
-    print('tick')
+import time
+import numpy as np
+from sklearn.utils import shuffle
+
+with np.load('./data/npz/dataset.npz') as data:
+    features = data['features'].astype(np.float32)
+    labels = data['labels'].astype(np.float32)
+
+# print(data.dtype)
+print(labels.dtype)
+time.sleep(20)
+print('tick')
+# features, labels = shuffle(features, labels, random_state=0)
+# test_num = features.shape[0]//10
+
+# features_ph = tf.placeholder(tf.float32, shape=(features.shape[0], 128, 256))
+# features_v = tf.Variable(features_ph)
+# dataset = tf.data.Dataset.from_tensor_slices((features_v, labels))
+
+# iterator = tf.data.Iterator.from_structure(dataset.output_types, 
+#                                            dataset.output_shapes)
+# next_batch = iterator.get_next(name='next_batch')
+# training_init_op = iterator.make_initializer(dataset)
+
+# with tf.Session() as sess:
+#     sess.run(tf.global_variables_initializer(), feed_dict={features_ph: features})

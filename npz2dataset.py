@@ -6,8 +6,8 @@ num_classes = 4
 batch_size = 64
 
 with np.load('./data/npz/test.npz') as data:
-    features = data['features']
-    labels = data['labels']
+    features = data['features'].astype(np.float32)
+    labels = data['labels'].astype(np.float32)
 # labels = labels - 1   # labels should be named from 0
 features, labels = shuffle(features, labels, random_state=0)
 test_num = features.shape[0]//10
@@ -26,8 +26,12 @@ test_dataset = tf.data.Dataset.from_tensor_slices((features[0:test_num],
 test_dataset = test_dataset.batch(batch_size)
 test_batch_num = test_num//batch_size + 1
 
-training_dataset = tf.data.Dataset.from_tensor_slices((features[test_num:], 
+features_ph = tf.placeholder(tf.float32, shape=(features.shape[0]-test_num, 128, 256))
+features_v = tf.Variable(features_ph)
+training_dataset = tf.data.Dataset.from_tensor_slices((features_v, 
                                                        labels[test_num:]))
+# training_dataset = tf.data.Dataset.from_tensor_slices((features[test_num:], 
+                                                    #    labels[test_num:]))
 training_dataset = training_dataset.repeat()
 training_dataset = training_dataset.batch(batch_size)
 

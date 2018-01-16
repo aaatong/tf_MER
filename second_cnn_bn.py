@@ -92,7 +92,7 @@ def cnn(x, keep_prob, phase_train):
     return cnn_output, keep_prob
 
 def main():
-    num_steps = 15000
+    num_steps = 2
     x_input = tf.placeholder(tf.float32, [None, 128, 256])
     y_input = tf.placeholder(tf.int32, [None, nd.num_classes])
 
@@ -152,7 +152,7 @@ def main():
 
         train_writer = tf.summary.FileWriter('tb_log/train', sess.graph)
         # test_writer = tf.summary.FileWriter('tb_log/test')
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.global_variables_initializer(), feed_dict={nd.features_ph: nd.features[nd.test_num:]})
         # sess.run(tf.local_variables_initializer())
         # sess.run(nd.iterator.initializer)
         sess.run(nd.training_init_op)
